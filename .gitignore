@@ -1,0 +1,10 @@
+.zerodha.crd
+*.html
+__pycache__/
+*.log
+*.pyc
+
+src/test/htmlcov/
+src/test/.coverage
+src/lib/*.csv
+statement/*.*

@@ -1,0 +1,14 @@
+keyring
+keyrings.alt
+numpy
+kiteconnect
+selenium
+pd
+pandas
+bs4
+pymongo
+requests
+beautifulsoup4
+lxml
+plotly
+matplotlib
