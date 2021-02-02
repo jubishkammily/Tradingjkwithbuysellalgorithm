@@ -30,6 +30,6 @@ if __name__ == "__main__":
     # print("order_id",order_id)
 
     transactionWrapper = TransactionWrapper(logger,kite_login,"SBIN")
-    transactionWrapper.buy_share_MIS(275.55,1)
+    transactionWrapper.buy_share_MIS(275.55)
      
     

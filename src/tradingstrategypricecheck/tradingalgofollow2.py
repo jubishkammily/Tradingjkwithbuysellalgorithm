@@ -8,19 +8,18 @@ from pprint import pprint
 import pandas as pd 
 
 import time
-import threading
 
 from databasemodel.databasemodelpricefollow import DatabaseModelPriceFollow
 
 
 
-class FollowAlgo:
-    def __init__(self,_kite_login,_trade_transact_wrapper,_logger,profit_add_amount):        
+class FollowAlgoSecond:
+    def __init__(self,_kite_login,_trade_transact_wrapper,_logger):        
         self.kite_login = _kite_login
         self.logger = _logger
         self.list_row_buy = []
         self.list_row_sell = []
-        self.fifty_paise = profit_add_amount
+        self.fifty_paise = 0.50
         self.trade_transact_wrapper = _trade_transact_wrapper
         self.quantity = 40
         
@@ -90,72 +89,9 @@ class FollowAlgo:
         self.logger.info('find_purchase_diff')
         return purchase_diff
 
-    def determine_bull(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result):
-        share_price = self.get_share_price(share_name)
-        current_price_First =  share_price
-        print("Check for Bull market")
-        # result = "None"
-        max_time_forwhile=0
-        index = 0
-        print("Bull Index : ",index)
-        while True:        
-             current_price_int = self.get_share_price(share_name)    
-             # print("share_price",share_price)
-             if(current_price_int > current_price_First):
-                 current_price_First = current_price_int
-                 index = index + 1
-                 print("Bull Index : ",index)
-                 if index == 5:
-                     market_result.result = "Bull"
-                     break                       
-             if(max_time_forwhile == total_index_times_time):
-                 print("No change in direction Bull Check for 180 seconds")
-                 self.logger.info("No change in direction Bull Check for 180 seconds")
-                 market_result.result = "None"
-                 break            
-             time.sleep(decision_time_in_seconds)
-             max_time_forwhile = max_time_forwhile + 1 
-             if(market_result.result is not "None"):
-                 break      
-        print("determine_bull",market_result.result)
-        # return result
-    
-    def determine_bear(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result):
-        share_price = self.get_share_price(share_name)
-        current_price_First =  share_price
-        print("Check for Bear market")
-        # result = "None"
-        max_time_forwhile=0  
-        index = 0      
-        print("Bear Index : ",index)
-        while True:        
-            current_price_int = self.get_share_price(share_name)                    
-            # print("share_price",share_price)
-            if(current_price_int < current_price_First):
-                current_price_First = current_price_int
-                index = index + 1
-                print("Bear Index : ",index)
-                if index == price_change_count:
-                    market_result.result = "Bear"
-                    break                                       
-            if(max_time_forwhile == total_index_times_time):
-                print("No change in direction Bear Check for 180 seconds")
-                self.logger.info("No change in direction Bear Check for 180 seconds")
-                market_result.result = "None"
-                break   
-            time.sleep(decision_time_in_seconds)
-            max_time_forwhile = max_time_forwhile + 1
-            if(market_result.result is not "None"):
-                break
-
-        print("determine_bear",market_result.result)    
-        # return result
-
-    
+        
     
     def determin_share_direction(self,share_name):
-
-        market_result = MarketResult()
         
         share_price = self.get_share_price(share_name)
         current_price_First =  share_price
@@ -167,33 +103,55 @@ class FollowAlgo:
         decision_time_in_seconds = 5 
         total_index_times_time = 180
         max_time_forwhile = 0
-        price_change_count = 8
-
-        bull_thread = threading.Thread(target=self.determine_bull,args=(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result),daemon=True)
-        bear_thread = threading.Thread(target=self.determine_bear,args=(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result),daemon=True)
-
-        bull_thread.start()
-        bear_thread.start()
-
-        bull_thread.join()
-        bear_thread.join()
     
-        # while result == "None":
-        #     if(result == "None"):
-        #         result = self.determine_bear(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result)
+        while result == "None":
+            print("Cheking for Bear")
+            if(result == "None"):
+                while True:        
+                    current_price_int = self.get_share_price(share_name)                    
+                    # print("share_price",share_price)
+                    if(current_price_int < current_price_First):
+                        current_price_First = current_price_int
+                        index = index + 1
+                        if index == 5:
+                            result = "Bear"
+                            break                                       
+                    if(max_time_forwhile == total_index_times_time):
+                        print("No change in direction Bear Check for 180 seconds")
+                        self.logger.info("No change in direction Bear Check for 180 seconds")
+                        result = "None"
+                        break   
+                    time.sleep(decision_time_in_seconds)
+                    max_time_forwhile = max_time_forwhile + 1
             
-        #     if(result == "None"):
-        #         result = self.determine_bull(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result)
+            max_time_forwhile = 0
+            print("Cheking for Bull")
+            
+            if(result == "None"):
+                while True:        
+                    current_price_int = self.get_share_price(share_name)    
+                    # print("share_price",share_price)
+                    if(current_price_int > current_price_First):
+                        current_price_First = current_price_int
+                        index = index + 1
+                        if index == 5:
+                            result = "Bull"
+                            break                       
+                    if(max_time_forwhile == total_index_times_time):
+                        print("No change in direction Bull Check for 180 seconds")
+                        self.logger.info("No change in direction Bull Check for 180 seconds")
+                        result = "None"
+                        break            
+                    time.sleep(decision_time_in_seconds)
+                    max_time_forwhile = max_time_forwhile + 1
     
-        print("market_result.result  :",market_result.result)
-        result = market_result.result
+
         return result
     
 
     def buy_share(self,current,quantity): 
         try:
             is_buy_status = self.trade_transact_wrapper.buy_share_MIS(current,quantity)        
-            # is_buy_status = True       
             if(is_buy_status):
                 print("Bought 500 shares for rs :",current)
                 self.logger.info("Bought 500 shares for rs : "+ str(current))
@@ -211,7 +169,6 @@ class FollowAlgo:
     def sell_share(self,current,quantity):   
         try:
             is_sell_status = self.trade_transact_wrapper.sell_share_MIS(current,quantity)
-            # is_sell_status = True   
             if(is_sell_status):
                 print("Sold 500 shares for rs :",current)
                 self.logger.info("Bought 500 shares for rs : "+ str(current))
@@ -242,8 +199,6 @@ class FollowAlgo:
             if(current_price_int < stop_loss):
                 if(current_price_int!=0):
                     is_sold = self.sell_share(current_price_int,quantity)
-                    self.logger.info("Loss sell with 50 paise")
-                    print("Loss sell with 50 paise")
             elif(current_price_int > test_profit_fifty_paise):
                 is_sold = self.sell_share(current_price_int,quantity)
                 self.logger.info("Booked sell with 50 paise")
@@ -280,8 +235,6 @@ class FollowAlgo:
             if(current_price_int > stop_loss):
                 if(current_price_int!=0):
                     is_bought = self.buy_share(current_price_int,quantity)
-                    self.logger.info("Loss buy with 50 paise")
-                    print("Loss buy with 50 paise")
             elif(current_price_int < test_profit_fifty_paise):
                 is_bought = self.buy_share(current_price_int,quantity)
                 self.logger.info("Booked buy with 50 paise")
@@ -323,9 +276,9 @@ class FollowAlgo:
                 if(buy_status):                    
                     self.list_row_buy = [share_name,"Bought",current_price_int,stop_loss,"None",0]
                     self.test_table.save_current_transaction(self.list_row_buy)
-                    print("stop_loss set after buy :", str(stop_loss))
-                    self.logger.info('stop_loss set after buy : '+ str(stop_loss))
-                    self.track_buy(bought_price,stop_loss,purchase_diff,share_name,quantity)
+                print("stop_loss set after buy :", str(stop_loss))
+                self.logger.info('stop_loss set after buy : '+ str(stop_loss))
+                self.track_buy(bought_price,stop_loss,purchase_diff,share_name,quantity)
                 time.sleep(10)
 
 
@@ -341,16 +294,11 @@ class FollowAlgo:
                 if(sell_status):                    
                     self.list_row_sell = [share_name,"Sold",current_price_int,stop_loss,"None",0]
                     self.test_table.save_current_transaction(self.list_row_sell)
-                    print("stop_loss set after Sell :", str(stop_loss))
-                    self.logger.info('stop_loss set after Sell : '+ str(stop_loss))
-                    self.track_sell(sold_price,stop_loss,purchase_diff,share_name,quantity)
+                print("stop_loss set after Sell :", str(stop_loss))
+                self.logger.info('stop_loss set after Sell : '+ str(stop_loss))
+                self.track_sell(sold_price,stop_loss,purchase_diff,share_name,quantity)
                 time.sleep(10)
 
             time.sleep(10)
 
-
-
-
-class MarketResult:
-    result = "None"
 

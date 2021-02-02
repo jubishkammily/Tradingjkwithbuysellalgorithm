@@ -1,5 +1,5 @@
 from lib.kite_login_util import KiteLoginUtil
-from tradingstrategypricecheck.tradingalgopffollow import FollowAlgo
+from tradingstrategypricecheck.tradingalgofollow2 import FollowAlgoSecond
 from tradingstrategypricecheck.transactionwrapper import TransactionWrapper
 
 import logging
@@ -27,27 +27,19 @@ if __name__ == "__main__":
 
     try:
         share_nse_name = "NSE:TATAMOTORS"
-        share_name_t = "TATAMOTORS"
-        # share_nse_name = "NSE:ICICIBANK"
-        # share_name_t = "ICICIBANK"
-        # share_nse_name = "NSE:SBIN"
-        # share_name_t = "SBIN"
         # transactionWrapper = TransactionWrapper(logger,kite_login,"TATAMOTORS",kite_login.kite.PRODUCT_MIS)
-        transactionWrapper = TransactionWrapper(logger,kite_login,kite_login.kite.PRODUCT_MIS,share_name_t)
+        transactionWrapper = TransactionWrapper(logger,kite_login,"TATAMOTORS",kite_login.kite.PRODUCT_CNC)
         print("starting alog")
         logger.info('starting alog')
-        # profit_add_amount = 0.50
-        profit_add_amount = 1
-        algo = FollowAlgo(kite_login,transactionWrapper,logger,profit_add_amount)       
+        algo = FollowAlgoSecond(kite_login,transactionWrapper,logger)       
         # purchase_diff = algo.find_purchase_diff("Tata Motors",url)
-        purchase_diff = 30
-        quantity = 100
-        
+        purchase_diff = 20
+        quantity = 40
+        # share_nse_name = "NSE:SBIN"
         # purchase_diff = algo.find_purchase_diff("SBI",url)
         share_price = algo.get_share_price(share_nse_name)
-        print("Test share Price"+share_nse_name+" ",share_price)    
         print("purchase_diff",purchase_diff)
-        
+        #print(type(share_price))    
         algo.tradealgostart(purchase_diff,share_nse_name,quantity)
         # algo.buy_share(275)
     except Exception as e:

@@ -8,7 +8,6 @@ from pprint import pprint
 import pandas as pd 
 
 import time
-import threading
 
 from databasemodel.databasemodelpricefollow import DatabaseModelPriceFollow
 
@@ -90,72 +89,59 @@ class FollowAlgo:
         self.logger.info('find_purchase_diff')
         return purchase_diff
 
-    def determine_bull(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result):
+    def determine_bull(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name):
         share_price = self.get_share_price(share_name)
         current_price_First =  share_price
         print("Check for Bull market")
-        # result = "None"
+        result = "None"
         max_time_forwhile=0
         index = 0
-        print("Bull Index : ",index)
         while True:        
              current_price_int = self.get_share_price(share_name)    
              # print("share_price",share_price)
              if(current_price_int > current_price_First):
                  current_price_First = current_price_int
                  index = index + 1
-                 print("Bull Index : ",index)
                  if index == 5:
-                     market_result.result = "Bull"
+                     result = "Bull"
                      break                       
              if(max_time_forwhile == total_index_times_time):
                  print("No change in direction Bull Check for 180 seconds")
                  self.logger.info("No change in direction Bull Check for 180 seconds")
-                 market_result.result = "None"
+                 result = "None"
                  break            
              time.sleep(decision_time_in_seconds)
-             max_time_forwhile = max_time_forwhile + 1 
-             if(market_result.result is not "None"):
-                 break      
-        print("determine_bull",market_result.result)
-        # return result
+             max_time_forwhile = max_time_forwhile + 1        
+        return result
     
-    def determine_bear(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result):
+    def determine_bear(self,decision_time_in_seconds,total_index_times_time,price_change_count,share_name):
         share_price = self.get_share_price(share_name)
         current_price_First =  share_price
         print("Check for Bear market")
-        # result = "None"
+        result = "None"
         max_time_forwhile=0  
         index = 0      
-        print("Bear Index : ",index)
         while True:        
             current_price_int = self.get_share_price(share_name)                    
             # print("share_price",share_price)
             if(current_price_int < current_price_First):
                 current_price_First = current_price_int
                 index = index + 1
-                print("Bear Index : ",index)
                 if index == price_change_count:
-                    market_result.result = "Bear"
+                    result = "Bear"
                     break                                       
             if(max_time_forwhile == total_index_times_time):
                 print("No change in direction Bear Check for 180 seconds")
                 self.logger.info("No change in direction Bear Check for 180 seconds")
-                market_result.result = "None"
+                result = "None"
                 break   
             time.sleep(decision_time_in_seconds)
-            max_time_forwhile = max_time_forwhile + 1
-            if(market_result.result is not "None"):
-                break
-
-        print("determine_bear",market_result.result)    
-        # return result
+            max_time_forwhile = max_time_forwhile + 1        
+        return result
 
     
     
     def determin_share_direction(self,share_name):
-
-        market_result = MarketResult()
         
         share_price = self.get_share_price(share_name)
         current_price_First =  share_price
@@ -168,25 +154,58 @@ class FollowAlgo:
         total_index_times_time = 180
         max_time_forwhile = 0
         price_change_count = 8
-
-        bull_thread = threading.Thread(target=self.determine_bull,args=(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result),daemon=True)
-        bear_thread = threading.Thread(target=self.determine_bear,args=(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result),daemon=True)
-
-        bull_thread.start()
-        bear_thread.start()
-
-        bull_thread.join()
-        bear_thread.join()
     
-        # while result == "None":
-        #     if(result == "None"):
-        #         result = self.determine_bear(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result)
+        while result == "None":
+            if(result == "None"):
+                result = self.determine_bear(decision_time_in_seconds,total_index_times_time,price_change_count,share_name)
             
-        #     if(result == "None"):
-        #         result = self.determine_bull(decision_time_in_seconds,total_index_times_time,price_change_count,share_name,market_result)
+            if(result == "None"):
+                result = self.determine_bull(decision_time_in_seconds,total_index_times_time,price_change_count,share_name)
+
+           
+            
+            
+            # print("Cheking for Bull")
+            
+            # if(result == "None"):
+            #     while True:        
+            #         current_price_int = self.get_share_price(share_name)    
+            #         # print("share_price",share_price)
+            #         if(current_price_int > current_price_First):
+            #             current_price_First = current_price_int
+            #             index = index + 1
+            #             if index == 5:
+            #                 result = "Bull"
+            #                 break                       
+            #         if(max_time_forwhile == total_index_times_time):
+            #             print("No change in direction Bull Check for 180 seconds")
+            #             self.logger.info("No change in direction Bull Check for 180 seconds")
+            #             result = "None"
+            #             break            
+            #         time.sleep(decision_time_in_seconds)
+            #         max_time_forwhile = max_time_forwhile + 1
+            
+            # max_time_forwhile = 0
+            # print("Cheking for Bear")
+            # if(result == "None"):
+            #     while True:        
+            #         current_price_int = self.get_share_price(share_name)                    
+            #         # print("share_price",share_price)
+            #         if(current_price_int < current_price_First):
+            #             current_price_First = current_price_int
+            #             index = index + 1
+            #             if index == price_change_count:
+            #                 result = "Bear"
+            #                 break                                       
+            #         if(max_time_forwhile == total_index_times_time):
+            #             print("No change in direction Bear Check for 180 seconds")
+            #             self.logger.info("No change in direction Bear Check for 180 seconds")
+            #             result = "None"
+            #             break   
+            #         time.sleep(decision_time_in_seconds)
+            #         max_time_forwhile = max_time_forwhile + 1
     
-        print("market_result.result  :",market_result.result)
-        result = market_result.result
+        print("result :",result)
         return result
     
 
@@ -348,9 +367,4 @@ class FollowAlgo:
 
             time.sleep(10)
 
-
-
-
-class MarketResult:
-    result = "None"
 
