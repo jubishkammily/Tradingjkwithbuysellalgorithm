@@ -9,12 +9,13 @@ import pandas as pd
 
 import time
 import threading
+from datetime import datetime
 
 from databasemodel.databasemodelpricefollow import DatabaseModelPriceFollow
 
 
 
-class FollowAlgo:
+class FollowAlgo2:
     def __init__(self,_kite_login,_trade_transact_wrapper,_logger,profit_add_amount):        
         self.kite_login = _kite_login
         self.logger = _logger
@@ -23,6 +24,7 @@ class FollowAlgo:
         self.fifty_paise = profit_add_amount
         self.trade_transact_wrapper = _trade_transact_wrapper
         self.quantity = 40
+        self.timer_wait = 15
         
 
     def algorithm():        
@@ -253,9 +255,14 @@ class FollowAlgo:
                         self.logger.info("Loss sell with 50 paise")
                         print("Loss sell with 50 paise")
                 elif(current_price_int > test_profit_fifty_paise):
-                    is_sold = self.sell_share(current_price_int,quantity)
-                    self.logger.info("Booked sell with 50 paise")
-                    print("Booked sell with 50 paise")
+                    stop_loss = current_price_int 
+                    test_profit_fifty_paise = current_price_int + self.fifty_paise
+                    print("Updated stop loss ",str(stop_loss))
+                    self.logger.info("Updated stop loss " +str(stop_loss))
+                    time.sleep(self.timer_wait)
+                    # is_sold = self.sell_share(current_price_int,quantity)
+                    # self.logger.info("Booked sell with 50 paise")
+                    # print("Booked sell with 50 paise")
                             
      
                 if(is_sold):
@@ -292,9 +299,14 @@ class FollowAlgo:
                         self.logger.info("Loss buy with 50 paise")
                         print("Loss buy with 50 paise")
                 elif(current_price_int < test_profit_fifty_paise):
-                    is_bought = self.buy_share(current_price_int,quantity)
-                    self.logger.info("Booked buy with 50 paise")
-                    print("Booked buy with 50 paise")
+                    stop_loss = current_price_int 
+                    test_profit_fifty_paise = current_price_int + self.fifty_paise
+                    print("Updated stop loss ",str(stop_loss))
+                    self.logger.info("Updated stop loss " +str(stop_loss))
+                    time.sleep(self.timer_wait)
+                    # is_bought = self.buy_share(current_price_int,quantity)
+                    # self.logger.info("Booked buy with 50 paise")
+                    # print("Booked buy with 50 paise")
 
                 if(is_bought):
                     self.list_row_sell[5] = current_price_int
@@ -310,6 +322,7 @@ class FollowAlgo:
     def tradealgostart(self,purchase_diff,share_name,quantity):
 
         self.test_table = DatabaseModelPriceFollow()
+        today3pm = now.replace(hour=15, minute=0, second=0, microsecond=0)
 
         while True:
             self.logger.info('starting algorithm')
@@ -317,46 +330,52 @@ class FollowAlgo:
             self.logger.info('This is determin_share_direction')
             result = self.determin_share_direction(share_name)
             print("result : ",result)
-            current_price_int = self.get_share_price(share_name)            
-            bought_price = 0
-            print ("This is Normal Buying and selling ")
-            self.logger.info('This is Normal Buying and selling')
-
-            if(result == "Bull"):  
-                print ("This is buying ")
-                self.logger.info('This is buying')
-
-                buy_status = self.buy_share(current_price_int,quantity)                
-                bought_price = current_price_int
-                stop_loss = bought_price - purchase_diff
-                if(buy_status):                    
-                    self.list_row_buy = [share_name,"Bought",current_price_int,stop_loss,"None",0]
-                    self.test_table.save_current_transaction(self.list_row_buy)
-                    print("stop_loss set after buy :", str(stop_loss))
-                    self.logger.info('stop_loss set after buy : '+ str(stop_loss))
-                    self.track_buy(bought_price,stop_loss,purchase_diff,share_name,quantity)
-                time.sleep(10)
-
-
-                
+            now = datetime.now()
+            if(now <today3pm):                                
+                current_price_int = self.get_share_price(share_name)            
+                bought_price = 0
+                print ("This is Normal Buying and selling ")
+                self.logger.info('This is Normal Buying and selling')
     
-            if(result == "Bear"):
-                print ("This is shorting ")
-                self.logger.info('This is shorting')
-                
-                sell_status = self.sell_share(current_price_int,quantity)
-                sold_price = current_price_int
-                stop_loss = sold_price + purchase_diff
-                if(sell_status):                    
-                    self.list_row_sell = [share_name,"Sold",current_price_int,stop_loss,"None",0]
-                    self.test_table.save_current_transaction(self.list_row_sell)
-                    print("stop_loss set after Sell :", str(stop_loss))
-                    self.logger.info('stop_loss set after Sell : '+ str(stop_loss))
-                    self.track_sell(sold_price,stop_loss,purchase_diff,share_name,quantity)
+                if(result == "Bull"):  
+                    print ("This is buying ")
+                    self.logger.info('This is buying')
+    
+                    buy_status = self.buy_share(current_price_int,quantity)                
+                    bought_price = current_price_int
+                    stop_loss = bought_price - purchase_diff
+                    if(buy_status):                    
+                        self.list_row_buy = [share_name,"Bought",current_price_int,stop_loss,"None",0]
+                        self.test_table.save_current_transaction(self.list_row_buy)
+                        print("stop_loss set after buy :", str(stop_loss))
+                        self.logger.info('stop_loss set after buy : '+ str(stop_loss))
+                        self.track_buy(bought_price,stop_loss,purchase_diff,share_name,quantity)
+                    time.sleep(10)
+    
+    
+                    
+        
+                if(result == "Bear"):
+                    print ("This is shorting ")
+                    self.logger.info('This is shorting')
+                    
+                    sell_status = self.sell_share(current_price_int,quantity)
+                    sold_price = current_price_int
+                    stop_loss = sold_price + purchase_diff
+                    if(sell_status):                    
+                        self.list_row_sell = [share_name,"Sold",current_price_int,stop_loss,"None",0]
+                        self.test_table.save_current_transaction(self.list_row_sell)
+                        print("stop_loss set after Sell :", str(stop_loss))
+                        self.logger.info('stop_loss set after Sell : '+ str(stop_loss))
+                        self.track_sell(sold_price,stop_loss,purchase_diff,share_name,quantity)
+                    time.sleep(10)
+    
                 time.sleep(10)
-
-            time.sleep(10)
-
+            else:
+                self.logger.info('Time Exeeded 3pm so stopping trade')
+                print("Time Exeeded 3pm so stopping trade")
+                break
+             
 
 
 

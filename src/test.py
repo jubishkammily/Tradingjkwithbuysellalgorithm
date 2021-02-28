@@ -25,11 +25,26 @@ if __name__ == "__main__":
     stop_loss = None
     trigger_price = None
 
+    from datetime import datetime
+
 
     # order_id = kite_login.place_order("SBIN",1,275,kite_login.kite.TRANSACTION_TYPE_BUY,275,None,kite_login.kite.ORDER_TYPE_MARKET,kite_login.kite.VALIDITY_DAY,kite_login.kite.PRODUCT_CNC,kite_login.kite.VARIETY_REGULAR)
     # print("order_id",order_id)
 
-    transactionWrapper = TransactionWrapper(logger,kite_login,"SBIN")
-    transactionWrapper.buy_share_MIS(275.55)
+    # transactionWrapper = TransactionWrapper(logger,kite_login,"SBIN")
+    # transactionWrapper.buy_share_MIS(275.55)
+
+    now = datetime.now()
+    today8am = now.replace(hour=20, minute=0, second=0, microsecond=0)
+
+    if(now <today8am):
+        print("True")
+    else:
+        print("false")
+
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+
+
      
     

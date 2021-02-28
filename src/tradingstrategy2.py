@@ -26,7 +26,7 @@ if __name__ == "__main__":
     url = "https://www.ndtv.com/business/marketdata/most-active-stocks-by-volume/allnse_daily"
 
     try:
-        share_nse_name = "NSE:TATAMOTORS"
+        # share_nse_name = "NSE:TATAMOTORS"
         # transactionWrapper = TransactionWrapper(logger,kite_login,"TATAMOTORS",kite_login.kite.PRODUCT_MIS)
         transactionWrapper = TransactionWrapper(logger,kite_login,"TATAMOTORS",kite_login.kite.PRODUCT_CNC)
         print("starting alog")

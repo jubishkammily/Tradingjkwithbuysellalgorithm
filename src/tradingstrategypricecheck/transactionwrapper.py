@@ -48,7 +48,8 @@ class TransactionWrapper:
 
     def buy_share_generic(self,current,quantity): 
         try:
-            is_buy_status = self.buy_share_MIS(current,quantity)        
+            # is_buy_status = self.buy_share_MIS(current,quantity)        
+            is_buy_status = True
             if(is_buy_status):
                 print("Bought "+str(quantity)+" shares for rs :",current)
                 self.logger.info("Bought "+str(quantity)+" shares for rs : "+ str(current))
@@ -65,7 +66,8 @@ class TransactionWrapper:
     
     def sell_share_generic(self,current,quantity):   
         try:
-            is_sell_status = self.sell_share_MIS(current,quantity)
+            # is_sell_status = self.sell_share_MIS(current,quantity)
+            is_sell_status = True
             if(is_sell_status):
                 print("Sold "+str(quantity)+" shares for rs :",current)
                 self.logger.info("Bought "+str(quantity)+" shares for rs : "+ str(current))

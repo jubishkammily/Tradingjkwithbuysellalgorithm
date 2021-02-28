@@ -1,5 +1,6 @@
 from lib.kite_login_util import KiteLoginUtil
 from tradingstrategypricecheck.tradingalgopffollow import FollowAlgo
+from tradingstrategypricecheck.tradingalgopffollowstrategy2 import FollowAlgo2
 from tradingstrategypricecheck.transactionwrapper import TransactionWrapper
 
 import logging
@@ -10,7 +11,7 @@ if __name__ == "__main__":
     
     kite_login=KiteLoginUtil(exchange="NSE")
     kite_login.login()
-    print(kite_login.kite.ltp(["NSE:NIFTY BANK"]))
+    print(kite_login.kite.ltp(["NSE:NIFTY BANK"])) 
     print(kite_login.ltp("NSE:NIFTY BANK"))
     
     logger.setLevel(logging.INFO)
@@ -26,22 +27,23 @@ if __name__ == "__main__":
     url = "https://www.ndtv.com/business/marketdata/most-active-stocks-by-volume/allnse_daily"
 
     try:
-        share_nse_name = "NSE:TATAMOTORS"
-        share_name_t = "TATAMOTORS"
+        # share_nse_name = "NSE:TATAMOTORS"
+        # share_name_t = "TATAMOTORS"
         # share_nse_name = "NSE:ICICIBANK"
         # share_name_t = "ICICIBANK"
-        # share_nse_name = "NSE:SBIN"
-        # share_name_t = "SBIN"
+        share_nse_name = "NSE:SBIN"
+        share_name_t = "SBIN"
         # transactionWrapper = TransactionWrapper(logger,kite_login,"TATAMOTORS",kite_login.kite.PRODUCT_MIS)
         transactionWrapper = TransactionWrapper(logger,kite_login,kite_login.kite.PRODUCT_MIS,share_name_t)
         print("starting alog")
         logger.info('starting alog')
         # profit_add_amount = 0.50
-        profit_add_amount = 1
-        algo = FollowAlgo(kite_login,transactionWrapper,logger,profit_add_amount)       
+        profit_add_amount = 0.50
+        # algo = FollowAlgo(kite_login,transactionWrapper,logger,profit_add_amount)       
+        algo = FollowAlgo2(kite_login,transactionWrapper,logger,profit_add_amount)       
         # purchase_diff = algo.find_purchase_diff("Tata Motors",url)
-        purchase_diff = 30
-        quantity = 100
+        purchase_diff = 6
+        quantity = 300
         
         # purchase_diff = algo.find_purchase_diff("SBI",url)
         share_price = algo.get_share_price(share_nse_name)
